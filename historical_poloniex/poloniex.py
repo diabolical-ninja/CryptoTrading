@@ -58,14 +58,39 @@ def returnChartData(currency_pair, start_date, end_date, period, full = False):
 
 
 
-# Flatten JSON into dataframe
-usd_eth_hist = returnChartData('USDT_ETH','2009-01-01','2017-08-01',14400)
-usd_eth_hist = pd.DataFrame(usd_eth_hist)
-
-
-# Convert UNIX time to human-readable time
-usd_eth_hist['date'] = pd.to_datetime(usd_eth_hist['date'],unit='s')
-
+def return24hVolume(out = 'full'):
+    
+    """
+    Simple function to return the 24h Volume for currency pairs from Poloniex
+    Poloniex Docs: https://poloniex.com/support/api/
+    
+    Inputs Are:
+    out:     How much of the response to return
+                - full      (type: response) = Raw request object
+                - 24hVolume (type: dict)     = Traded currency pairs, volume and currency totals
+                - pairs     (type: list)     = Just the currency pairs traded in the last 24hrs
+    
+    Flag indicating whether or not to return only a list of the currency pairs
+    full:          Flag indicating if full payload should be returned or not.
+                   By default this is off
+    """  
+    
+    # The entry point to Poloniex's public API
+    base_url = "https://poloniex.com/public"
+    
+    # Build Full URL
+    full_url = "{}?command=return24hVolume".format(base_url)
+    
+    # Send request
+    response = requests.request("GET", full_url)
+    
+    # Determine how much of the response was asked for
+    if out == 'full':
+        return response
+    elif out == '24hVolume':
+        return response.json()
+    elif out == 'pairs':
+        return [x for x in return24hVolume().json().keys() if 'total' not in x]
 
 
 
