@@ -12,19 +12,22 @@ import pandas as pd
 
 
 
-def returnChartData(currency_pair, start_date, end_date, period, full = False):
+def returnChartData(currency_pair, start_date, end_date, period, out = 'full', include_ticker = False):
     
     """
     Simple function to return historical chart data from Poloniex
     Poloniex Docs: https://poloniex.com/support/api/
     
     Inputs Are:
-    currency_pair: From/To currencies, eg USD/BTC USDT_BTC
-    start:         Date as string. Format of YYYY-MM-DD
-    end:           Date as string. Format of YYYY-MM-DD
-    period:        Candlestick period in seconds (INT)
-    full:          Flag indicating if full payload should be returned or not.
-                   By default this is off
+    currency_pair:   From/To currencies, eg USD/BTC USDT_BTC
+    start:           Date as string. Format of YYYY-MM-DD
+    end:             Date as string. Format of YYYY-MM-DD
+    period:          Candlestick period in seconds (INT)
+    out:             How much of the response to return
+                          - full (type: response)  = Raw request object
+                          - json (type: dict)      = Historical pricing as a json
+                          - df   (type: pandas df) = Historical pricing flattened to a pandas df
+    include_ticker:  If df, should a column for the ticker be included
     """   
     
     # The entry point to Poloniex's public API
@@ -50,12 +53,18 @@ def returnChartData(currency_pair, start_date, end_date, period, full = False):
     response = requests.request("GET", full_url)
 
     # By default only return the json response. If desired, return the full object
-    if full == True:
+    if out == 'full':
         return response
-    else:
+    elif out == 'json':
         return response.json()
-
-
+    elif out == 'df':
+         price_hist = pd.DataFrame(response.json())
+         price_hist['date'] = pd.to_datetime(price_hist['date'],unit='s') # Convert UNIX time to human-readable time
+         
+         if include_ticker:
+             price_hist['ticker'] = currency_pair
+         
+         return price_hist
 
 
 def return24hVolume(out = 'full'):
@@ -69,10 +78,7 @@ def return24hVolume(out = 'full'):
                 - full      (type: response) = Raw request object
                 - 24hVolume (type: dict)     = Traded currency pairs, volume and currency totals
                 - pairs     (type: list)     = Just the currency pairs traded in the last 24hrs
-    
-    Flag indicating whether or not to return only a list of the currency pairs
-    full:          Flag indicating if full payload should be returned or not.
-                   By default this is off
+
     """  
     
     # The entry point to Poloniex's public API
