@@ -103,3 +103,7 @@ ENV/
 creds\.yaml
 
 misc\.txt
+
+\.idea/CryptoTrading\.iml
+
+\.idea/

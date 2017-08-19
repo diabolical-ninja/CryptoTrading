@@ -9,7 +9,7 @@ import requests
 import pandas as pd
 
 
-class newsapi:
+class NewsApi:
     '''
     News API: https://newsapi.org/
 
