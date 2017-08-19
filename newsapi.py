@@ -36,10 +36,10 @@ class newsapi:
         :param country:  The 2-letter ISO 3166-1 code of the country you would like to get sources for
                Possible options: au, de, gb, in, it, us
 
-        :param: out:   How much of the response to return
-                          - full (type: response)  = Raw request object
-                          - json (type: dict)      = Sources as JSON
-                          - df   (type: pandas df) = Sources flattened to a pandas df
+        :param: out: How much of the response to return
+                      - full (type: response)  = Raw request object
+                      - json (type: dict)      = Sources as JSON
+                      - df   (type: pandas df) = Sources flattened to a pandas df
         """
 
 
@@ -69,3 +69,45 @@ class newsapi:
             print "Oh No! Something went wrong collecting news sources..."
             print ex
 
+
+
+
+    # Articles
+    def articles(self, source, sortby=None, out='full'):
+        """
+        Provides a list of live article metadata from a news source or blog
+
+        :param source: The identifer for the news source or blog you want headlines from
+
+        :param sortby: Specify which type of list you want
+               Possible options: top, latest and popular
+
+        :param out: How much of the response to return
+                      - full (type: response)  = Raw request object
+                      - json (type: dict)      = Sources as JSON
+                      - df   (type: pandas df) = Sources flattened to a pandas df
+        """
+
+        header = {
+            'x-api-key': self.token
+        }
+
+        # Build out the request url
+        url = self.url + "/articles?source=" + source
+
+        if sortby:
+            url += "&sortBy=" + sortby
+
+        # Attempt the request & return in n
+        try:
+            response = requests.request("GET", url, headers = header)
+            if out == 'full':
+                return response
+            elif out == 'json':
+                return response.json()
+            elif out == 'df':
+                return pd.DataFrame(response.json()['articles'])
+
+        except Exception as ex:
+            print "Oh No! Something went wrong collecting news articles..."
+            print ex
