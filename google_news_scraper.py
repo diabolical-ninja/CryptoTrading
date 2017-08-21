@@ -12,7 +12,7 @@ from selenium import webdriver
 import articleDateExtractor
 
 
-def google_news_url(search_term, start_date, end_date, num_results=100):
+def google_news_url(search_term, start_date, end_date, language=None, num_results=100, sort = 'r'):
     """
     For a given search term and window, build out the corresponding google search term
 
@@ -20,6 +20,7 @@ def google_news_url(search_term, start_date, end_date, num_results=100):
     :param start_date (str):  Format = "YYYY-MM-DD"
     :param end_date (str):    Format = "YYYY-MM-DD"
     :param num_results (int): Allowed values are 10, 20, 30, 40, 50, and 100
+    :param sort (str): Allowed values are r (relevance), n (date - newest first), d (date with dupes - newest first) & o (date - oldest first)
 
     :return: URL for your search
     """
@@ -28,6 +29,8 @@ def google_news_url(search_term, start_date, end_date, num_results=100):
     base_url = 'https://www.google.com.au/search?tbm=nws'
     search_field = 'q={}'.format(search_term)
     num_results = 'num={}'.format(num_results)
+    sort_term = 'scoring={}'.format(sort)
+    lang_term = 'hl={}'.format(language) if language is not None else None
     
     # Build the custom date range (dtr)
     min_date = datetime.strptime(start_date,'%Y-%m-%d')
@@ -36,7 +39,8 @@ def google_news_url(search_term, start_date, end_date, num_results=100):
                                                                                max_date.month, max_date.day, max_date.year)
 
     # Build out url
-    full_url = [base_url,search_field,cdr,num_results]
+    full_url = [base_url,search_field,cdr,num_results,sort_term, lang_term]
+    full_url = [x for x in full_url if x is not None]
     full_url = '&'.join(full_url)
     
     return full_url
@@ -121,7 +125,7 @@ def get_search_results(url, driver_loc):
 """
 Sample Use:
 
-demo_url = google_news_url('bitcoin', '2017-07-04','2017-07-05', num_results= 10)
+demo_url = google_news_url(search_term = 'bitcoin', start_date = '2017-07-04', end_date = '2017-07-05', num_results= 10)
 driver_location = '<path/to/chrome/driver>'
 my_results = get_search_results(demo_url, driver_location)
 my_results
