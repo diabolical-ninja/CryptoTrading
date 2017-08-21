@@ -105,14 +105,17 @@ def get_search_results(url, driver_loc):
     # For each result, build out the desired data
     search_results = []
     for post in results:
-
-        post_link = post.get_attribute('href')
-        post_metadata = {}
-        post_metadata['title'] = post.text
-        post_metadata['url'] = post_link
-        post_metadata['author'], post_metadata['description'], post_metadata['publishedAt'] = get_url_metadata(post_link)
-
-        search_results.append(post_metadata)
+        
+        try:
+            post_link = post.get_attribute('href')
+            post_metadata = {}
+            post_metadata['title'] = post.text
+            post_metadata['url'] = post_link
+            post_metadata['author'], post_metadata['description'], post_metadata['publishedAt'] = get_url_metadata(post_link)
+    
+            search_results.append(post_metadata)
+        except:
+            continue
 
 
     # Close the browsers & return the search results
