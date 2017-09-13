@@ -8,7 +8,6 @@ Date:   2017-09-11
 # Required Packages
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 import seaborn as sns
 
 # Pretty Up the Plots
